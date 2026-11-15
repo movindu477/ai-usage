@@ -8,12 +8,9 @@ import {
   PinOff,
   X,
   Activity,
-  CloudSun,
-  Music,
 } from 'lucide-react';
-import { WidgetMode, ActiveWidgetTab } from '../../lib/types';
+import { WidgetMode } from '../../lib/types';
 import { quitApp } from '../../lib/ipc';
-import { useWidgetStore } from '../../store/useWidgetStore';
 
 interface HeaderProps {
   onOpenSettings: () => void;
@@ -28,7 +25,6 @@ export const Header: FC<HeaderProps> = ({
   isPinned = true,
   onTogglePin,
 }) => {
-  const { activeTab, setActiveTab } = useWidgetStore();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -44,38 +40,13 @@ export const Header: FC<HeaderProps> = ({
   }, []);
 
   return (
-    <div className="relative flex items-center justify-between h-[26px] mb-1.5 select-none shrink-0">
-      {/* Left: Segmented Switcher (System / Weather / Music) */}
-      <div
-        className="flex items-center gap-0.5 p-0.5 rounded-[8px] bg-[var(--surface-1)] border border-[var(--border)]"
-        onMouseDown={(e) => e.stopPropagation()}
-        data-interactive="true"
-      >
-        {(
-          [
-            { id: 'system', label: 'System', icon: Activity },
-            { id: 'weather', label: 'Weather', icon: CloudSun },
-            { id: 'music', label: 'Music', icon: Music },
-          ] as { id: ActiveWidgetTab; label: string; icon: typeof Activity }[]
-        ).map((tab) => {
-          const TabIcon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1 h-[20px] px-2 rounded-[6px] text-[10px] font-semibold transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-[var(--color-accent-1)] text-white shadow-sm'
-                  : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)] bg-transparent'
-              }`}
-            >
-              <TabIcon className="w-2.5 h-2.5 shrink-0" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+    <div className="relative flex items-center justify-between h-[24px] mb-1 select-none shrink-0">
+      {/* Left: Title */}
+      <div className="flex items-center gap-1.5 overflow-hidden">
+        <Activity className="w-3.5 h-3.5 text-[#26b988] shrink-0" />
+        <span className="text-[11.5px] font-semibold text-[var(--color-text-1)] tracking-tight truncate">
+          System Monitor
+        </span>
       </div>
 
       {/* Right Controls */}
@@ -93,9 +64,9 @@ export const Header: FC<HeaderProps> = ({
               onTogglePin();
             }}
             title={isPinned ? 'Always on Top (Click to Unpin)' : 'Click to Pin (Always on Top)'}
-            className={`flex items-center justify-center w-[24px] h-[24px] rounded-[7px] border transition-all cursor-pointer ${
+            className={`flex items-center justify-center w-[22px] h-[22px] rounded-[7px] border transition-all cursor-pointer ${
               isPinned
-                ? 'bg-[var(--color-accent-1)]/15 border-[var(--color-accent-1)]/40 text-[var(--color-accent-1)]'
+                ? 'bg-[#26b988]/15 border-[#26b988]/40 text-[#26b988]'
                 : 'bg-transparent border-transparent text-[var(--color-text-3)] hover:text-[var(--color-text-1)] hover:bg-[var(--surface-1)]'
             }`}
           >
@@ -111,13 +82,13 @@ export const Header: FC<HeaderProps> = ({
               e.stopPropagation();
               setShowMenu((prev) => !prev);
             }}
-            className="flex items-center justify-center w-[24px] h-[24px] rounded-[7px] text-[var(--color-text-3)] hover:text-[var(--color-text-1)] hover:bg-[var(--surface-1)] transition-colors cursor-pointer"
+            className="flex items-center justify-center w-[22px] h-[22px] rounded-[7px] text-[var(--color-text-3)] hover:text-[var(--color-text-1)] hover:bg-[var(--surface-1)] transition-colors cursor-pointer"
           >
             <MoreHorizontal className="w-3.5 h-3.5" />
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-[28px] z-50 w-36 py-1 rounded-[9px] bg-[var(--color-bg-elevated)] border border-[var(--border-strong)] shadow-2xl text-[10.5px]">
+            <div className="absolute right-0 top-[26px] z-50 w-36 py-1 rounded-[9px] bg-[var(--color-bg-elevated)] border border-[var(--border-strong)] shadow-2xl text-[10.5px]">
               <button
                 type="button"
                 onClick={(e) => {
@@ -168,7 +139,7 @@ export const Header: FC<HeaderProps> = ({
           }}
           data-tauri-drag-region={false}
           title="Quit Widget"
-          className="flex items-center justify-center w-[24px] h-[24px] rounded-[7px] text-[var(--color-text-3)] hover:text-red-400 hover:bg-red-500/15 transition-colors cursor-pointer"
+          className="flex items-center justify-center w-[22px] h-[22px] rounded-[7px] text-[var(--color-text-3)] hover:text-red-400 hover:bg-red-500/15 transition-colors cursor-pointer"
         >
           <X className="w-3.5 h-3.5" />
         </button>

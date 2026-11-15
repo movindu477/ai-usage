@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "AI Usage",
   "identifier": "io.github.aiusage.tracker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:5173",
@@ -14,8 +14,8 @@
       {
         "label": "widget",
         "title": "AI Usage",
-        "width": 340,
-        "height": 290,
+        "width": 544,
+        "height": 304,
         "resizable": false,
         "decorations": false,
         "transparent": true,

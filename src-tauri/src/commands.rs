@@ -101,7 +101,7 @@ pub fn set_mode(win: WebviewWindow, mode: String) -> Result<(), String> {
         "compact" => (270.0, 110.0),
         "rail" => (44.0, 160.0),
         "settings" => (340.0, 360.0),
-        _ => (340.0, 290.0), // "expanded"
+        _ => (544.0, 304.0), // "expanded" 2-column layout
     };
 
     let _ = win.set_size(tauri::Size::Logical(tauri::LogicalSize::new(w, h)));

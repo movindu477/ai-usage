@@ -1,6 +1,6 @@
 [package]
 name = "ai_usage"
-version = "1.1.0"
+version = "1.1.1"
 description = "System Monitor & Desktop Utility Widget"
 authors = ["AI Usage Project"]
 edition = "2021"

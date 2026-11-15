@@ -13,7 +13,7 @@ use crate::commands::*;
 use crate::db::open_db;
 use crate::sources::start_polling_tasks;
 use crate::state::AppState;
-use crate::system_stats::get_system_stats;
+use crate::system_stats::{get_cursor_pos, get_system_stats};
 use crate::window::snap::snap_to_edges;
 use crate::window::tray::create_tray;
 
@@ -100,6 +100,7 @@ pub fn run() {
             get_media_session,
             media_control,
             get_system_stats,
+            get_cursor_pos,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
