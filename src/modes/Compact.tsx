@@ -1,41 +1,40 @@
-import React from 'react';
-import { ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Maximize2, MoreHorizontal } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Maximize2, MoreHorizontal, Cpu, MemoryStick, Wifi } from 'lucide-react';
 import { Card } from '../components/common/Card';
-import { MetricOverview, ChartDataPoint, BindingWindow, WidgetMode } from '../lib/types';
-import { quotaBand, quotaColor, formatCountdown } from '../lib/format';
+import { WidgetMode } from '../lib/types';
+import { fetchSystemStats, SystemStats } from '../lib/system';
 
 interface CompactProps {
-  overview: MetricOverview;
-  series: ChartDataPoint[];
-  bindingWindow: BindingWindow | null;
-  providerName: string;
   onSetMode: (mode: WidgetMode) => void;
   onOpenSettings: () => void;
 }
 
 export const Compact: React.FC<CompactProps> = ({
-  overview,
-  series,
-  bindingWindow,
-  providerName,
   onSetMode,
   onOpenSettings,
 }) => {
-  const sparkData = series.map((s) => ({
-    val: s.automation + s.query + s.system,
-  }));
+  const [stats, setStats] = useState<SystemStats | null>(null);
 
-  const band = quotaBand(bindingWindow?.used_pct);
-  const barColor = quotaColor(band);
-  const countdown = formatCountdown(bindingWindow?.resets_at);
+  useEffect(() => {
+    fetchSystemStats().then(setStats);
+    const interval = setInterval(() => {
+      fetchSystemStats().then(setStats);
+    }, 1500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const cpuPct = stats ? stats.cpu_usage : 0;
+  const ramPct =
+    stats && stats.ram_total_gb > 0
+      ? Math.min(100, Math.round((stats.ram_used_gb / stats.ram_total_gb) * 100))
+      : 0;
 
   return (
     <Card width={270} height={110} padding={false} className="p-2.5 justify-between">
       {/* Top Header */}
       <div className="flex items-center justify-between h-4">
         <span className="text-[9.5px] uppercase tracking-wider text-[var(--color-text-3)] font-semibold">
-          {providerName}
+          System Monitor
         </span>
         <div className="flex items-center gap-1" onMouseDown={(e) => e.stopPropagation()}>
           <button
@@ -57,66 +56,44 @@ export const Compact: React.FC<CompactProps> = ({
         </div>
       </div>
 
-      {/* Main Metric and Sparkline */}
-      <div className="flex items-center justify-between gap-2 my-1">
-        <div className="flex flex-col">
-          <div className="flex items-baseline gap-1">
-            <span className="text-[19px] font-bold tracking-tight num text-[var(--color-text-1)] leading-none">
-              {overview.formatted_value}
-            </span>
-            <span className="text-[9.5px] text-[var(--color-text-3)] capitalize">
-              {overview.unit}
-            </span>
+      {/* Main CPU & RAM Row */}
+      <div className="flex items-center justify-between gap-3 my-1">
+        <div className="flex items-center gap-2">
+          <Cpu className="w-4 h-4 text-[var(--color-accent-1)]" />
+          <div>
+            <div className="text-[15px] font-bold num text-[var(--color-text-1)] leading-none">
+              {cpuPct.toFixed(1)}%
+            </div>
+            <div className="text-[8.5px] text-[var(--color-text-3)] mt-0.5">CPU Load</div>
           </div>
-          {overview.delta_pct !== undefined && (
-            <span className="text-[9px] font-medium text-[var(--color-success)] num mt-0.5">
-              +{overview.delta_pct}% this week
-            </span>
-          )}
         </div>
 
-        {/* Micro Sparkline */}
-        <div className="w-[85px] h-[30px] opacity-75">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={sparkData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
-              <defs>
-                <linearGradient id="compactGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#7c5cff" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#7c5cff" stopOpacity={0.0} />
-                </linearGradient>
-              </defs>
-              <Area
-                type="monotone"
-                dataKey="val"
-                stroke="#7c5cff"
-                fill="url(#compactGrad)"
-                strokeWidth={1.5}
-                isAnimationActive={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+        <div className="flex items-center gap-2">
+          <MemoryStick className="w-4 h-4 text-[var(--color-accent-2)]" />
+          <div>
+            <div className="text-[15px] font-bold num text-[var(--color-text-1)] leading-none">
+              {stats ? stats.ram_used_gb : '—'} GB
+            </div>
+            <div className="text-[8.5px] text-[var(--color-text-3)] mt-0.5">
+              RAM ({ramPct}%)
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Mini Quota bar */}
-      <div className="flex items-center gap-1.5 pt-1 border-t border-white/[0.06]">
-        <div className="flex-1 h-[2.5px] rounded-full bg-white/10 overflow-hidden">
-          {bindingWindow?.used_pct !== null && bindingWindow?.used_pct !== undefined && (
-            <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{
-                width: `${Math.min(100, Math.max(0, bindingWindow.used_pct))}%`,
-                backgroundColor: barColor,
-              }}
-            />
-          )}
+      {/* Bottom Wi-Fi Strip */}
+      <div className="flex items-center justify-between pt-1 border-t border-[var(--border)] text-[9px]">
+        <div className="flex items-center gap-1.5 text-[var(--color-text-2)] truncate">
+          <Wifi
+            className={`w-3 h-3 shrink-0 ${
+              (stats?.wifi_speed_mbps ?? 0) > 0 ? 'text-[var(--color-success)]' : 'text-red-400'
+            }`}
+          />
+          <span className="truncate">{stats?.wifi_ssid || 'Disconnected'}</span>
         </div>
-        <div className="flex items-center gap-1 text-[8.5px] font-medium shrink-0">
-          <span style={{ color: barColor }} className="num font-semibold">
-            {bindingWindow?.used_pct != null ? `${Math.round(bindingWindow.used_pct)}%` : '—'}
-          </span>
-          {countdown && <span className="text-[var(--color-text-3)]">· {countdown}</span>}
-        </div>
+        <span className="num font-semibold text-[var(--color-text-1)] shrink-0">
+          {(stats?.wifi_speed_mbps ?? 0) > 0 ? `${stats?.wifi_speed_mbps} Mbps` : 'Offline'}
+        </span>
       </div>
     </Card>
   );

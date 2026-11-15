@@ -9,7 +9,7 @@ interface WidgetStoreState {
 }
 
 export const useWidgetStore = create<WidgetStoreState>((set) => ({
-  activeTab: 'ai',
+  activeTab: 'system',
   setActiveTab: (tab) => set({ activeTab: tab }),
   tempUnit:
     (localStorage.getItem('ai_weather_unit') as 'fahrenheit' | 'celsius') ||

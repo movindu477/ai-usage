@@ -10,26 +10,29 @@ export function useAutoUpdate() {
   useEffect(() => {
     let isMounted = true;
 
-    const runCheck = async () => {
+    async function checkForUpdates() {
       try {
         const update = await check();
         if (update && isMounted) {
+          console.log(`Found update ${update.version}. Downloading...`);
           setUpdateAvailable(update);
           setIsUpdating(true);
           setUpdateProgress(`Updating to v${update.version}...`);
           await update.downloadAndInstall((event) => {
             if (event.event === 'Finished') {
+              console.log('Download complete. Restarting...');
               setUpdateProgress('Restarting...');
             }
           });
           await relaunch();
         }
-      } catch (err) {
-        console.warn('Updater check error:', err);
+      } catch (error) {
+        console.error('Update check failed:', error);
       }
-    };
+    }
 
-    const timer = setTimeout(runCheck, 5000);
+    // Check 3 seconds after the app opens (let UI load first)
+    const timer = setTimeout(checkForUpdates, 3000);
     return () => {
       isMounted = false;
       clearTimeout(timer);

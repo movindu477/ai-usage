@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
-import { MetricOverview, BindingWindow, WidgetMode } from '../lib/types';
-import { quotaBand, quotaColor } from '../lib/format';
+import React, { useState, useEffect } from 'react';
+import { WidgetMode } from '../lib/types';
+import { fetchSystemStats, SystemStats } from '../lib/system';
 
 interface RailProps {
-  overview: MetricOverview;
-  bindingWindow: BindingWindow | null;
   onSetMode: (mode: WidgetMode) => void;
 }
 
-export const Rail: React.FC<RailProps> = ({
-  overview,
-  bindingWindow,
-  onSetMode,
-}) => {
+export const Rail: React.FC<RailProps> = ({ onSetMode }) => {
   const [hovered, setHovered] = useState(false);
-  const band = quotaBand(bindingWindow?.used_pct);
-  const color = quotaColor(band);
+  const [stats, setStats] = useState<SystemStats | null>(null);
 
-  const pct = bindingWindow?.used_pct ?? 0;
+  useEffect(() => {
+    fetchSystemStats().then(setStats);
+    const interval = setInterval(() => {
+      fetchSystemStats().then(setStats);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pct = stats ? Math.min(100, Math.max(0, stats.cpu_usage)) : 0;
 
   return (
     <div
@@ -31,7 +32,7 @@ export const Rail: React.FC<RailProps> = ({
           ? '0 0 24px rgba(124, 92, 255, 0.25)'
           : '0 18px 50px rgba(0,0,0,0.55)',
       }}
-      title="Click to expand widget"
+      title="Click to expand System Monitor"
     >
       {/* 6px accent dot */}
       <div
@@ -39,7 +40,7 @@ export const Rail: React.FC<RailProps> = ({
         style={{ backgroundColor: 'var(--color-accent-1)' }}
       />
 
-      {/* Number rotated 90 deg */}
+      {/* CPU % rotated 90 deg */}
       <div className="flex-1 flex items-center justify-center my-2">
         <span
           className="text-[12px] font-semibold num tracking-tight text-[var(--color-text-1)] whitespace-nowrap"
@@ -48,18 +49,15 @@ export const Rail: React.FC<RailProps> = ({
             transform: 'rotate(180deg)',
           }}
         >
-          {overview.formatted_value}
+          CPU {pct.toFixed(0)}%
         </span>
       </div>
 
-      {/* 3px vertical quota track */}
-      <div className="w-[3px] h-[36px] rounded-full bg-[rgba(255,255,255,0.08)] overflow-hidden shrink-0 flex flex-col justify-end">
+      {/* 3px vertical CPU load track */}
+      <div className="w-[3px] h-[36px] rounded-full bg-[var(--surface-2)] overflow-hidden shrink-0 flex flex-col justify-end">
         <div
-          className="w-full rounded-full transition-all duration-300"
-          style={{
-            height: `${Math.min(100, Math.max(0, pct))}%`,
-            backgroundColor: color,
-          }}
+          className="w-full rounded-full transition-all duration-300 bg-[var(--color-accent-1)]"
+          style={{ height: `${pct}%` }}
         />
       </div>
     </div>

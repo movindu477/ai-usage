@@ -27,9 +27,9 @@ interface SettingsProps {
 }
 
 const PROVIDERS = [
-  { id: 'claude', name: 'Claude Code', color: '#7c5cff', subtitle: 'OAuth usage & assistant logs' },
-  { id: 'antigravity', name: 'Antigravity', color: '#ff8a4c', subtitle: 'Connect-RPC local loopback' },
-  { id: 'codex', name: 'OpenAI Codex', color: '#636375', subtitle: 'Local usage events' },
+  { id: 'sysinfo', name: 'CPU, RAM & Storage (C:)', color: '#7c5cff', subtitle: 'Native Rust sysinfo (1.5s live refresh)' },
+  { id: 'wifi', name: 'Wi-Fi Interface & Speed', color: '#22c55e', subtitle: 'Background WLAN link monitor (10s cache)' },
+  { id: 'media_weather', name: 'Weather & System Media', color: '#38bdf8', subtitle: 'Open-Meteo + Windows SMTC transport' },
 ];
 
 export const Settings: React.FC<SettingsProps> = ({
@@ -192,10 +192,10 @@ Timestamp: ${new Date(diag.last_poll_timestamp * 1000).toISOString()}`;
           />
         </div>
 
-        {/* Providers Overview */}
+        {/* Sensors Overview */}
         <div className="flex flex-col gap-1">
           <span className="text-[9.5px] uppercase tracking-wider text-[var(--color-text-3)] font-semibold px-0.5">
-            Supported AI Tools
+            Active System Sensors
           </span>
           {PROVIDERS.map((p) => (
             <div

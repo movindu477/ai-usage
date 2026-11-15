@@ -1,7 +1,7 @@
 export type WidgetMode = 'expanded' | 'plans' | 'compact' | 'rail' | 'settings';
 export type MetricType = 'tasks' | 'tokens' | 'cost';
 export type ProviderScope = 'all' | 'claude' | 'antigravity' | 'codex';
-export type ActiveWidgetTab = 'ai' | 'weather' | 'music';
+export type ActiveWidgetTab = 'system' | 'weather' | 'music';
 
 export interface MediaSessionInfo {
   title: string;

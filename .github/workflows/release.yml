@@ -39,6 +39,6 @@ jobs:
           releaseBody: |
             See the assets below to download and install.
             Windows 10/11 x64 · local-only · no telemetry.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           includeUpdaterJson: true

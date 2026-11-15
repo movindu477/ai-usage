@@ -1,32 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/common/Card';
 import { Header } from '../components/widget/Header';
-import { MetricSwitch } from '../components/widget/MetricSwitch';
-import { ProviderChips } from '../components/widget/ProviderChips';
-import { UsageChart } from '../components/widget/UsageChart';
-import { QuotaStrip } from '../components/widget/QuotaStrip';
+import { SystemMonitor } from '../components/widget/SystemMonitor';
 import { WeatherPanel } from '../components/widgets/WeatherPanel';
 import { MediaPanel } from '../components/widgets/MediaPanel';
 import { useWidgetStore } from '../store/useWidgetStore';
 import { Check, Edit2 } from 'lucide-react';
 import { getSetting, setSetting } from '../lib/ipc';
-import {
-  WidgetMode,
-  MetricType,
-  ProviderScope,
-  MetricOverview,
-  ChartDataPoint,
-  BindingWindow,
-} from '../lib/types';
+import { WidgetMode } from '../lib/types';
 
 interface ExpandedProps {
-  overview: MetricOverview;
-  series: ChartDataPoint[];
-  bindingWindow: BindingWindow | null;
-  scope: ProviderScope;
-  metric: MetricType;
-  onScopeChange: (scope: ProviderScope) => void;
-  onCycleMetric: () => void;
   onSetMode: (mode: WidgetMode) => void;
   onOpenSettings: () => void;
   isPinned?: boolean;
@@ -34,20 +17,12 @@ interface ExpandedProps {
 }
 
 export const Expanded: React.FC<ExpandedProps> = ({
-  overview,
-  series,
-  bindingWindow,
-  scope,
-  metric,
-  onScopeChange,
-  onCycleMetric,
   onSetMode,
   onOpenSettings,
   isPinned = true,
   onTogglePin,
 }) => {
   const { activeTab } = useWidgetStore();
-  const [chartType, setChartType] = useState<'bar' | 'area' | 'heatmap'>('bar');
   const [userName, setUserName] = useState<string>('User');
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [tempName, setTempName] = useState<string>('');
@@ -72,18 +47,14 @@ export const Expanded: React.FC<ExpandedProps> = ({
     setIsEditingName(false);
   };
 
-  // Determine friendly time-of-day greeting
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
     <Card width={340} height={290} className="justify-between">
-      {/* 1. Header with AI / Weather / Music switcher, Pin/Unpin, and Chart switcher */}
+      {/* 1. Header with System / Weather / Music switcher, Pin/Unpin, and Menu */}
       <Header
-        title="AI"
-        chartType={chartType}
-        onChartTypeChange={setChartType}
         onOpenSettings={onOpenSettings}
         onSetMode={onSetMode}
         isPinned={isPinned}
@@ -98,13 +69,13 @@ export const Expanded: React.FC<ExpandedProps> = ({
         <>
           {/* 2. Welcome Message & Live Sync Status */}
           <div
-            className="flex items-center justify-between mb-1 px-0.5 shrink-0"
+            className="flex items-center justify-between mb-1.5 px-0.5 shrink-0"
             onMouseDown={(e) => e.stopPropagation()}
             data-interactive="true"
           >
             <div className="flex items-center gap-1.5 overflow-hidden">
               {isEditingName ? (
-                <div className="flex items-center gap-1 bg-white/10 px-1.5 py-0.5 rounded-[5px] border border-white/20">
+                <div className="flex items-center gap-1 bg-[var(--surface-2)] px-1.5 py-0.5 rounded-[5px] border border-[var(--border-strong)]">
                   <input
                     type="text"
                     value={tempName}
@@ -156,24 +127,8 @@ export const Expanded: React.FC<ExpandedProps> = ({
             </div>
           </div>
 
-          {/* 3. Metric Switch */}
-          <MetricSwitch
-            overview={overview}
-            metric={metric}
-            onCycleMetric={onCycleMetric}
-          />
-
-          {/* 4. Provider Chips */}
-          <ProviderChips selected={scope} onSelect={onScopeChange} />
-
-          {/* 5. Chart with legend & chartType support */}
-          <UsageChart data={series} chartType={chartType} />
-
-          {/* 6. Quota Strip */}
-          <QuotaStrip
-            binding={bindingWindow}
-            onClick={() => onSetMode('plans')}
-          />
+          {/* 3. Live System Monitor (CPU, RAM, Storage, Wi-Fi) */}
+          <SystemMonitor />
         </>
       )}
     </Card>
