@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "AI Usage",
+  "identifier": "io.github.aiusage.tracker",
+  "version": "1.0.0",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "widget",
+        "title": "AI Usage",
+        "width": 340,
+        "height": 290,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "focus": false,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "publisher": "AI Usage Project",
+    "copyright": "© 2026 AI Usage Project",
+    "category": "Utility",
+    "shortDescription": "Local-only usage tracker for Claude Code, Antigravity, and Codex.",
+    "longDescription": "A frameless always-on-top widget that shows tokens, tasks, cost, and quota windows across your AI tools. Runs entirely on your machine.",
+    "targets": [
+      "nsis"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico",
+        "languages": [
+          "English"
+        ],
+        "displayLanguageSelector": false
+      }
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ5MjRFMTI4QkEwNjM4M0YKUldRL09BYTZLT0VrU1RGOG5SR1g2ckRHSHQwSTVuQXE5bWpkV01Jam41S2hmdmY1WU40SHlaSFYK",
+      "endpoints": [
+        "https://github.com/movindu477/ai-usage/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}
