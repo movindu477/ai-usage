@@ -9,6 +9,7 @@ import {
   ProviderScope,
   WifiInfo,
   DiagnosticsInfo,
+  MediaSessionInfo,
 } from './types';
 import {
   getMockChartData,
@@ -202,5 +203,34 @@ export async function quitApp(): Promise<void> {
     await invoke('quit_app');
   } catch (err) {
     console.warn('IPC quit_app error:', err);
+  }
+}
+
+export async function getMediaSession(): Promise<MediaSessionInfo> {
+  try {
+    return await invoke<MediaSessionInfo>('get_media_session');
+  } catch (err) {
+    console.warn('IPC get_media_session error:', err);
+    return {
+      title: 'Love Is All',
+      artist: 'Ronnie Wood',
+      album: '',
+      is_playing: false,
+      has_session: false,
+      position_secs: 92,
+      duration_secs: 173,
+      album_art: null,
+    };
+  }
+}
+
+export async function mediaControl(
+  action: 'play' | 'pause' | 'toggle' | 'next' | 'previous'
+): Promise<boolean> {
+  try {
+    return await invoke<boolean>('media_control', { action });
+  } catch (err) {
+    console.warn('IPC media_control error:', err);
+    return false;
   }
 }

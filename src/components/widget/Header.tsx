@@ -12,9 +12,13 @@ import {
   Pin,
   PinOff,
   X,
+  Sparkles,
+  CloudSun,
+  Music,
 } from 'lucide-react';
-import { WidgetMode } from '../../lib/types';
+import { WidgetMode, ActiveWidgetTab } from '../../lib/types';
 import { quitApp } from '../../lib/ipc';
+import { useWidgetStore } from '../../store/useWidgetStore';
 
 interface HeaderProps {
   title?: string;
@@ -35,6 +39,7 @@ export const Header: FC<HeaderProps> = ({
   isPinned = true,
   onTogglePin,
 }) => {
+  const { activeTab, setActiveTab } = useWidgetStore();
   const [showChartDropdown, setShowChartDropdown] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
@@ -61,11 +66,37 @@ export const Header: FC<HeaderProps> = ({
 
   return (
     <div className="relative flex items-center justify-between h-[26px] mb-1.5 select-none shrink-0">
-      {/* Left: Title */}
-      <div className="flex items-center gap-2 overflow-hidden">
-        <span className="text-[11.5px] font-semibold text-[var(--color-text-1)] tracking-tight truncate">
-          {title}
-        </span>
+      {/* Left: Widget Mode Segmented Switcher (AI / Weather / Music) */}
+      <div
+        className="flex items-center gap-0.5 p-0.5 rounded-[8px] bg-[var(--surface-1)] border border-[var(--border)]"
+        onMouseDown={(e) => e.stopPropagation()}
+        data-interactive="true"
+      >
+        {(
+          [
+            { id: 'ai', label: title || 'AI', icon: Sparkles },
+            { id: 'weather', label: 'Weather', icon: CloudSun },
+            { id: 'music', label: 'Music', icon: Music },
+          ] as { id: ActiveWidgetTab; label: string; icon: typeof Sparkles }[]
+        ).map((tab) => {
+          const TabIcon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1 h-[20px] px-2 rounded-[6px] text-[10px] font-semibold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-[var(--color-accent-1)] text-white shadow-sm'
+                  : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)] bg-transparent'
+              }`}
+            >
+              <TabIcon className="w-2.5 h-2.5 shrink-0" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Right Controls */}
@@ -93,56 +124,58 @@ export const Header: FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Chart type segmented pill */}
-        <div className="relative" ref={chartDropdownRef}>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowChartDropdown((prev) => !prev);
-              setShowMenu(false);
-            }}
-            className="flex items-center gap-1 h-[24px] px-2 rounded-[7px] bg-[var(--surface-1)] border border-[var(--border)] text-[10.5px] font-medium text-[var(--color-text-1)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
-          >
-            <ChartIcon className="w-3 h-3 text-[var(--color-accent-1)]" />
-            <span className="capitalize">{chartType}</span>
-            <ChevronDown className="w-2.5 h-2.5 text-[var(--color-text-3)]" />
-          </button>
+        {/* Chart type segmented pill (only on AI tab) */}
+        {activeTab === 'ai' && (
+          <div className="relative" ref={chartDropdownRef}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowChartDropdown((prev) => !prev);
+                setShowMenu(false);
+              }}
+              className="flex items-center gap-1 h-[24px] px-2 rounded-[7px] bg-[var(--surface-1)] border border-[var(--border)] text-[10.5px] font-medium text-[var(--color-text-1)] hover:bg-[var(--surface-2)] transition-colors cursor-pointer"
+            >
+              <ChartIcon className="w-3 h-3 text-[var(--color-accent-1)]" />
+              <span className="capitalize">{chartType}</span>
+              <ChevronDown className="w-2.5 h-2.5 text-[var(--color-text-3)]" />
+            </button>
 
-          {showChartDropdown && (
-            <div className="absolute right-0 top-[28px] z-50 w-32 py-1 rounded-[9px] bg-[var(--color-bg-elevated)] border border-[var(--border-strong)] shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
-              {(
-                [
-                  { id: 'bar', label: 'Bar Chart', icon: BarChart3 },
-                  { id: 'area', label: 'Area Chart', icon: TrendingUp },
-                  { id: 'heatmap', label: 'Heatmap Chart', icon: Grid3X3 },
-                ] as const
-              ).map((item) => {
-                const ItemIcon = item.icon;
-                const isActive = chartType === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onChartTypeChange(item.id);
-                      setShowChartDropdown(false);
-                    }}
-                    className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 text-[10.5px] font-medium cursor-pointer transition-colors ${
-                      isActive
-                        ? 'bg-[var(--color-accent-1)]/15 text-[var(--color-accent-1)] font-semibold'
-                        : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:bg-white/5'
-                    }`}
-                  >
-                    <ItemIcon className="w-3 h-3 shrink-0" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
+            {showChartDropdown && (
+              <div className="absolute right-0 top-[28px] z-50 w-32 py-1 rounded-[9px] bg-[var(--color-bg-elevated)] border border-[var(--border-strong)] shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+                {(
+                  [
+                    { id: 'bar', label: 'Bar Chart', icon: BarChart3 },
+                    { id: 'area', label: 'Area Chart', icon: TrendingUp },
+                    { id: 'heatmap', label: 'Heatmap Chart', icon: Grid3X3 },
+                  ] as const
+                ).map((item) => {
+                  const ItemIcon = item.icon;
+                  const isActive = chartType === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChartTypeChange(item.id);
+                        setShowChartDropdown(false);
+                      }}
+                      className={`w-full text-left px-2.5 py-1.5 flex items-center gap-2 text-[10.5px] font-medium cursor-pointer transition-colors ${
+                        isActive
+                          ? 'bg-[var(--color-accent-1)]/15 text-[var(--color-accent-1)] font-semibold'
+                          : 'text-[var(--color-text-2)] hover:text-[var(--color-text-1)] hover:bg-white/5'
+                      }`}
+                    >
+                      <ItemIcon className="w-3 h-3 shrink-0" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* More options button */}
         <div className="relative" ref={menuRef}>

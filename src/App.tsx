@@ -82,11 +82,11 @@ export default function App() {
     loadData();
   }, [loadData]);
 
-  // Real-time background auto-update timer (every 3.5 seconds)
+  // Throttled UI sync timer (every 15 seconds; countdowns tick locally)
   useEffect(() => {
     const interval = setInterval(() => {
       loadData();
-    }, 3500);
+    }, 15000);
     return () => clearInterval(interval);
   }, [loadData]);
 

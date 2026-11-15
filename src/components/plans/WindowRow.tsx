@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { QuotaWindow } from '../../lib/types';
 import { quotaBand, quotaColor, formatCountdown } from '../../lib/format';
 
@@ -7,19 +7,26 @@ interface WindowRowProps {
 }
 
 export const WindowRow: React.FC<WindowRowProps> = ({ window }) => {
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTick((t) => t + 1), 30000);
+    return () => clearInterval(timer);
+  }, []);
+
   const band = quotaBand(window.used_pct);
   const color = quotaColor(band);
   const countdown = formatCountdown(window.resets_at_utc);
 
   return (
-    <div className="grid grid-cols-[96px_1fr_34px_56px] items-center h-[22px] text-[10px] gap-2">
+    <div className="grid grid-cols-[108px_1fr_34px_56px] items-center h-[22px] text-[10px] gap-2">
       {/* Label */}
-      <span className="text-[var(--color-text-2)] truncate font-normal">
+      <span className="text-[var(--color-text-2)] truncate font-normal" title={window.label}>
         {window.label}
       </span>
 
       {/* Bar */}
-      <div className="h-[3px] rounded-[2px] bg-[rgba(255,255,255,0.08)] overflow-hidden">
+      <div className="h-[3px] rounded-[2px] bg-[var(--surface-2)] overflow-hidden">
         {window.used_pct !== null && window.used_pct !== undefined ? (
           <div
             className="h-full rounded-[2px] transition-all duration-300"

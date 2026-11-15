@@ -132,18 +132,9 @@ pub async fn fetch_and_save_antigravity_status(
         Err(e) => {
             if let Ok(c) = conn.lock() {
                 let _ = upsert_quota_window(
-                    &c,
-                    "antigravity",
-                    None,
-                    "*",
-                    "rolling",
-                    "Antigravity",
-                    None,
-                    None,
-                    "ag_status",
-                    now,
-                    Some("Antigravity not running — start it to see quotas"),
-                    None,
+                    &c, "antigravity", None, "*", "rolling", "Antigravity",
+                    None, None, "ag_status", now,
+                    Some("Antigravity not running — start it to see quotas"), None,
                 );
             }
             return Err(e);
@@ -198,18 +189,8 @@ pub async fn fetch_and_save_antigravity_status(
         None => {
             if let Ok(c) = conn.lock() {
                 let _ = upsert_quota_window(
-                    &c,
-                    "antigravity",
-                    None,
-                    "*",
-                    "rolling",
-                    "Antigravity",
-                    None,
-                    None,
-                    "ag_status",
-                    now,
-                    Some("Antigravity unreachable"),
-                    None,
+                    &c, "antigravity", None, "*", "rolling", "Antigravity",
+                    None, None, "ag_status", now, Some("Antigravity unreachable"), None,
                 );
             }
             return Err(anyhow!("Antigravity RPC endpoint unreachable"));
@@ -251,29 +232,33 @@ pub async fn fetch_and_save_antigravity_status(
     );
 
     if let Some(configs) = model_configs {
+        if !configs.is_empty() {
+            let _ = locked_conn.execute(
+                "DELETE FROM quota_windows WHERE provider_id = 'antigravity' AND model_key = '*'",
+                [],
+            );
+        }
         for config in configs {
-            let label = match config.get("label").and_then(|l| l.as_str()) {
-                Some(l) => l,
-                None => continue,
+            let label = match config
+                .get("label")
+                .or_else(|| config.get("modelName"))
+                .or_else(|| config.get("model_name"))
+                .and_then(|l| l.as_str())
+            {
+                Some(l) if !l.trim().is_empty() => l,
+                _ => continue,
             };
 
             let quota_info = config.get("quotaInfo");
-
             let remaining_fraction = quota_info
                 .and_then(|q| q.get("remainingFraction"))
                 .and_then(|r| r.as_f64());
-
             let used_pct = remaining_fraction.map(|rf| ((1.0 - rf) * 100.0).clamp(0.0, 100.0));
-
-            let reset_time = quota_info
-                .and_then(|q| q.get("resetTime"))
-                .and_then(|rt| {
-                    if let Some(s) = rt.as_str() {
-                        DateTime::parse_from_rfc3339(s).ok().map(|dt| dt.timestamp())
-                    } else {
-                        rt.as_i64()
-                    }
-                });
+            let reset_time = quota_info.and_then(|q| q.get("resetTime")).and_then(|rt| {
+                rt.as_str()
+                    .and_then(|s| DateTime::parse_from_rfc3339(s).ok().map(|dt| dt.timestamp()))
+                    .or_else(|| rt.as_i64())
+            });
 
             upsert_quota_window(
                 &locked_conn,

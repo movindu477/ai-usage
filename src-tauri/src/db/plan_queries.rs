@@ -131,7 +131,12 @@ pub fn get_all_plans(conn: &Connection) -> Result<Vec<ProviderPlanInfo>> {
 
         let fetched_at = windows.iter().map(|w| w.fetched_at_utc).max();
         let is_stale = windows.iter().any(|w| w.stale);
-        let error = windows.iter().find_map(|w| w.error.clone());
+        let has_valid_window = windows.iter().any(|w| w.used_pct.is_some() && w.error.is_none());
+        let error = if has_valid_window {
+            None
+        } else {
+            windows.iter().find_map(|w| w.error.clone())
+        };
 
         result.push(ProviderPlanInfo {
             provider: p_id,

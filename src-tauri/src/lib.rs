@@ -95,6 +95,8 @@ pub fn run() {
             set_metric,
             snap_to_edges,
             quit_app,
+            get_media_session,
+            media_control,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

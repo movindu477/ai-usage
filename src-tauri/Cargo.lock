@@ -31,9 +31,10 @@ dependencies = [
 
 [[package]]
 name = "ai_usage"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "anyhow",
+ "base64 0.22.1",
  "chrono",
  "dirs 5.0.1",
  "notify",

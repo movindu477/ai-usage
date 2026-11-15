@@ -6,6 +6,7 @@ use crate::db::queries::{
     get_chart_series, get_overview_data, BindingWindow, ChartDataPoint,
     DiagnosticsInfo, MetricOverview, ProviderPlanInfo,
 };
+use crate::sources::media::{execute_media_control, get_current_media_session, MediaSessionInfo};
 use crate::sources::network::{get_wifi_status, WifiInfo};
 use crate::sources::{antigravity, claude_jsonl, claude_usage};
 use crate::state::AppState;
@@ -166,4 +167,18 @@ pub fn reset_app_data(state: State<'_, AppState>) -> Result<(), String> {
 #[tauri::command]
 pub fn quit_app(app: tauri::AppHandle) {
     app.exit(0);
+}
+
+#[tauri::command]
+pub async fn get_media_session() -> Result<MediaSessionInfo, String> {
+    tokio::task::spawn_blocking(get_current_media_session)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn media_control(action: String) -> Result<bool, String> {
+    tokio::task::spawn_blocking(move || execute_media_control(&action))
+        .await
+        .map_err(|e| e.to_string())?
 }

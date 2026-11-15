@@ -1,6 +1,30 @@
 export type WidgetMode = 'expanded' | 'plans' | 'compact' | 'rail' | 'settings';
 export type MetricType = 'tasks' | 'tokens' | 'cost';
 export type ProviderScope = 'all' | 'claude' | 'antigravity' | 'codex';
+export type ActiveWidgetTab = 'ai' | 'weather' | 'music';
+
+export interface MediaSessionInfo {
+  title: string;
+  artist: string;
+  album: string;
+  is_playing: boolean;
+  has_session: boolean;
+  position_secs: number;
+  duration_secs: number;
+  album_art: string | null;
+}
+
+export interface WeatherData {
+  city: string;
+  temperature: number;
+  humidity: number;
+  windSpeed: number;
+  weatherCode: number;
+  condition: string;
+  isDay: boolean;
+  unit: 'fahrenheit' | 'celsius';
+  fetchedAt: number;
+}
 
 export interface ChartDataPoint {
   day: string;

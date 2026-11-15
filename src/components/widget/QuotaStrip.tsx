@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BindingWindow } from '../../lib/types';
 import { quotaBand, quotaColor, formatCountdown } from '../../lib/format';
 
@@ -8,6 +8,14 @@ interface QuotaStripProps {
 }
 
 export const QuotaStrip: React.FC<QuotaStripProps> = ({ binding, onClick }) => {
+  const [, setTick] = useState(0);
+
+  // Local countdown ticker every 30s without backend polling
+  useEffect(() => {
+    const timer = setInterval(() => setTick((t) => t + 1), 30000);
+    return () => clearInterval(timer);
+  }, []);
+
   if (!binding) {
     return (
       <button
@@ -43,7 +51,7 @@ export const QuotaStrip: React.FC<QuotaStripProps> = ({ binding, onClick }) => {
       </span>
 
       {/* Progress track */}
-      <div className="flex-1 h-[3px] rounded-full bg-white/[0.08] overflow-hidden">
+      <div className="flex-1 h-[3px] rounded-full bg-[var(--surface-2)] overflow-hidden">
         {binding.used_pct !== null && binding.used_pct !== undefined ? (
           <div
             className="h-full rounded-full transition-all duration-300"
