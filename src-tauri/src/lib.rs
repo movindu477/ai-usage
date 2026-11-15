@@ -92,6 +92,7 @@ pub fn run() {
             set_scope,
             set_metric,
             snap_to_edges,
+            quit_app,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

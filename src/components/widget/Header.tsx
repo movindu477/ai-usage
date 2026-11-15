@@ -11,8 +11,10 @@ import {
   ExternalLink,
   Pin,
   PinOff,
+  X,
 } from 'lucide-react';
 import { WidgetMode } from '../../lib/types';
+import { quitApp } from '../../lib/ipc';
 
 interface HeaderProps {
   title?: string;
@@ -210,6 +212,20 @@ export const Header: FC<HeaderProps> = ({
             </div>
           )}
         </div>
+
+        {/* Close / Quit button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            quitApp();
+          }}
+          data-tauri-drag-region={false}
+          title="Quit AI Usage"
+          className="flex items-center justify-center w-[24px] h-[24px] rounded-[7px] text-[var(--color-text-3)] hover:text-red-400 hover:bg-red-500/15 transition-colors cursor-pointer"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );

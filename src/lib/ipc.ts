@@ -196,3 +196,11 @@ export async function resetAppData(): Promise<void> {
     console.warn('IPC reset_app_data error:', err);
   }
 }
+
+export async function quitApp(): Promise<void> {
+  try {
+    await invoke('quit_app');
+  } catch (err) {
+    console.warn('IPC quit_app error:', err);
+  }
+}

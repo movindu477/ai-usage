@@ -87,17 +87,19 @@ pub fn discover_antigravity() -> Result<AntigravityDiscovery> {
     }
 
     // Query all listening ports for PID
-    if let Ok(port_output) = Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-Command",
-            &format!(
-                "(Get-NetTCPConnection -OwningProcess {} -State Listen -ErrorAction SilentlyContinue).LocalPort",
-                target_pid
-            ),
-        ])
-        .output()
-    {
+    let mut port_cmd = Command::new("powershell");
+    port_cmd.args([
+        "-NoProfile",
+        "-Command",
+        &format!(
+            "(Get-NetTCPConnection -OwningProcess {} -State Listen -ErrorAction SilentlyContinue).LocalPort",
+            target_pid
+        ),
+    ]);
+    #[cfg(windows)]
+    port_cmd.creation_flags(CREATE_NO_WINDOW);
+
+    if let Ok(port_output) = port_cmd.output() {
         let port_str = String::from_utf8_lossy(&port_output.stdout);
         for line in port_str.lines() {
             if let Ok(p) = line.trim().parse::<u16>() {

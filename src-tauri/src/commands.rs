@@ -162,3 +162,8 @@ pub fn reset_app_data(state: State<'_, AppState>) -> Result<(), String> {
     let conn = state.conn.lock().map_err(|e| e.to_string())?;
     db_reset_app_data(&conn).map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub fn quit_app(app: tauri::AppHandle) {
+    app.exit(0);
+}
