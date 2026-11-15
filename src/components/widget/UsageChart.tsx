@@ -26,7 +26,7 @@ interface SeriesConfig {
 const SERIES_CONFIGS: SeriesConfig[] = [
   { key: 'automation', label: 'Automation', color: '#7c5cff' },
   { key: 'query', label: 'Queries', color: '#ff8a4c' },
-  { key: 'system', label: 'System', color: '#454558' },
+  { key: 'system', label: 'System', color: 'var(--color-accent-3)' },
 ];
 
 export const UsageChart: React.FC<UsageChartProps> = ({
@@ -118,10 +118,10 @@ export const UsageChart: React.FC<UsageChartProps> = ({
             >
               <XAxis
                 dataKey="day"
-                axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
+                axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
                 tickMargin={4}
-                tick={{ fill: 'rgba(238, 238, 245, 0.4)', fontSize: 9 }}
+                tick={{ fill: 'var(--color-text-3)', fontSize: 9 }}
               />
               <YAxis
                 domain={[0, 300]}
@@ -129,9 +129,9 @@ export const UsageChart: React.FC<UsageChartProps> = ({
                 axisLine={false}
                 tickLine={false}
                 width={26}
-                tick={{ fill: 'rgba(238, 238, 245, 0.4)', fontSize: 8 }}
+                tick={{ fill: 'var(--color-text-3)', fontSize: 8 }}
               />
-              <Tooltip cursor={{ fill: 'rgba(255, 255, 255, 0.04)', radius: 4 }} content={renderTooltip} />
+              <Tooltip cursor={{ fill: 'var(--surface-1)', radius: 4 }} content={renderTooltip} />
               {visibleSeries.automation && (
                 <Bar
                   dataKey="automation"
@@ -157,7 +157,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({
                   dataKey="system"
                   name="System"
                   stackId="a"
-                  fill="#454558"
+                  fill="var(--color-accent-3)"
                   radius={[2, 2, 0, 0]}
                   animationDuration={350}
                 />

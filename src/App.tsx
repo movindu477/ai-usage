@@ -27,10 +27,12 @@ import { Compact } from './modes/Compact';
 import { Rail } from './modes/Rail';
 import { Settings } from './modes/Settings';
 import { PlansView } from './components/plans/PlansView';
+import { useTheme } from './hooks/useTheme';
 
 const METRIC_CYCLE: MetricType[] = ['tasks', 'tokens', 'cost'];
 
 export default function App() {
+  useTheme();
   const [mode, setMode] = useState<WidgetMode>('expanded');
   const [scope, setScope] = useState<ProviderScope>('all');
   const [metric, setMetric] = useState<MetricType>('tasks');

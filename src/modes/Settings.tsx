@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Card } from '../components/common/Card';
 import { PrivacyModal } from '../components/common/PrivacyModal';
+import { ResetConfirmModal } from '../components/common/ResetConfirmModal';
+import { ThemeSelector } from '../components/common/ThemeSelector';
+import { useTheme } from '../hooks/useTheme';
 import {
   ArrowLeft,
   User,
@@ -35,6 +38,7 @@ export const Settings: React.FC<SettingsProps> = ({
   onClose,
   onRescan,
 }) => {
+  const { theme, setTheme } = useTheme();
   const [userName, setUserName] = useState('User');
   const [savedName, setSavedName] = useState(false);
   const [copiedDiag, setCopiedDiag] = useState(false);
@@ -162,6 +166,9 @@ Timestamp: ${new Date(diag.last_poll_timestamp * 1000).toISOString()}`;
           </button>
         </div>
 
+        {/* Theme Preference */}
+        <ThemeSelector theme={theme} onSelect={setTheme} />
+
         {/* Opacity (Floor at 75%) */}
         <div className="flex flex-col gap-1 p-2 rounded-[7px] bg-white/[0.03] border border-white/[0.06]">
           <div className="flex items-center justify-between">
@@ -257,32 +264,10 @@ Timestamp: ${new Date(diag.last_poll_timestamp * 1000).toISOString()}`;
 
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (
-        <div
-          className="absolute inset-0 z-50 bg-[#0b0b0f]/95 backdrop-blur-md p-3 flex flex-col justify-center items-center gap-2 rounded-[20px] text-center"
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          <Trash2 className="w-6 h-6 text-red-400 mb-1" />
-          <div className="text-[11px] font-bold text-white">Reset Local Database?</div>
-          <div className="text-[9.5px] text-white/60 max-w-[200px]">
-            This will clear cached events and reset preferences. Your files and credentials are never touched.
-          </div>
-          <div className="flex items-center gap-2 mt-2 w-full">
-            <button
-              type="button"
-              onClick={() => setShowResetConfirm(false)}
-              className="flex-1 h-6 rounded bg-white/10 text-white text-[10px] font-medium cursor-pointer hover:bg-white/15"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleResetData}
-              className="flex-1 h-6 rounded bg-red-600 text-white text-[10px] font-bold cursor-pointer hover:bg-red-500"
-            >
-              Reset All
-            </button>
-          </div>
-        </div>
+        <ResetConfirmModal
+          onCancel={() => setShowResetConfirm(false)}
+          onConfirm={handleResetData}
+        />
       )}
     </Card>
   );
