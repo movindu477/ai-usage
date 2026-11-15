@@ -64,7 +64,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ5MjRFMTI4QkEwNjM4M0YKUldRL09BYTZLT0VrU1RGOG5SR1g2ckRHSHQwSTVuQXE5bWpkV01Jam41S2hmdmY1WU40SHlaSFYK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDBBREYzQUYwMjQ0Q0U5MkEKUldRcTZVd2s4RHJmQ216dmlMVTBvU0VCUm9VQi9LWHlPT2RFQ20vREVDbGNqNy9TNWpzZFdDRjMK",
       "endpoints": [
         "https://github.com/movindu477/ai-usage/releases/latest/download/latest.json"
       ]
